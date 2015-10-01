@@ -32,7 +32,7 @@ end
 post '/testcontent' do
   Nokogiri::XML::Builder.new do |xml|
     xml.Response {
-      xml.Say "Some words"
+      xml.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
     }
   end
 end
