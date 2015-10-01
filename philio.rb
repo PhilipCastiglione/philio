@@ -20,12 +20,16 @@ get '/client' do
   @client
 end
 
-get '/testcall' do
+get '/testcall/:number' do
   @client = Twilio::REST::Client.new account_sid, auth_token_totes_sekret
   @client.account.calls.create(:url => "https://philioapp.herokuapp.com/testcontent",
-                               :to   => "+61431838460",
+                               :to   => "+61" + params[:number],
                                :from => "+61282945949")
   'you are on a page'
+end
+
+get '/thing/:number' do
+  "the number is +61" + params[:number]
 end
 
 post '/testcontent' do
