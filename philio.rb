@@ -32,13 +32,12 @@ post '/testcontent' do
   response = Twilio::TwiML::Response.new do |r|
     r.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
   end
+  response.text
 end
 
 get '/testcontent' do
   response = Twilio::TwiML::Response.new do |r|
     r.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
   end
-  binding.pry
-  p response.text
   response.text
 end
