@@ -5,11 +5,12 @@ require 'twilio-ruby'
 require 'pry'
 require 'nokogiri'
 
-config_file 'config_or_whatever.yml'
+#config_file 'config_or_whatever.yml'
 
-account_sid = settings.twilio[:account_sid]
-auth_token_totes_sekret = settings.twilio[:auth_token]
-
+#account_sid = settings.twilio[:account_sid]
+#auth_token_totes_sekret = settings.twilio[:auth_token]
+account_sid = ENV['ACCOUNT_SID']
+auth_token_totes_sekret = ENV['AUTH_TOKEN']
 
 get '/' do
   "oh yeah baby"
