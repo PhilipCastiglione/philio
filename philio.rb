@@ -30,14 +30,14 @@ end
 
 post '/testcontent' do
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
+    r.Say "This is a Twilio public service announcement. Bunts is about to get his ass pounded in wall ball."
   end
   response.text
 end
 
 get '/testcontent' do
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
+    r.Say "This is a Twilio public service announcement. Bunts is about to get his ass pounded in wall ball."
   end
   response.text
 end
