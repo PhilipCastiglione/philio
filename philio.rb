@@ -34,14 +34,14 @@ end
 
 post '/testcontent' do
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "This is a Twilio public service announcement. Bunts is about to get his ass pounded in wall ball."
+    r.Say "test words"
   end
   response.text
 end
 
 get '/testcontent' do
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "This is a Twilio public service announcement. Bunts is about to get his ass pounded in wall ball."
+    r.Say "test words"
   end
   response.text
 end
