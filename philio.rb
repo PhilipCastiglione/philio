@@ -25,7 +25,7 @@ get '/testcall' do
   @client.account.calls.create(:url => "https://philioapp.herokuapp.com/testcontent",
                                :to   => "+61431838460",
                                :from => "+61282945949")
-  "oh hi there #{params[:number]}"
+  'you are on a page'
 end
 
 post '/testcontent' do
@@ -34,3 +34,9 @@ post '/testcontent' do
   end
 end
 
+get '/testcontent' do
+  response = Twilio::TwiML::Response.new do |r|
+    r.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
+  end
+  response.to_s
+end
