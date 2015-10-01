@@ -3,7 +3,6 @@ require 'sinatra/config_file'
 require 'sinatra/reloader'
 require 'twilio-ruby'
 require 'pry'
-require 'nokogiri'
 
 #config_file 'config_or_whatever.yml'
 
@@ -30,10 +29,8 @@ get '/testcall' do
 end
 
 post '/testcontent' do
-  Nokogiri::XML::Builder.new do |xml|
-    xml.Response {
-      xml.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
-    }
+  response = Twilio::TwiML::Response.new do |r|
+    r.Say "Some words that are somewhat longer to make sure there is enough time to hear them!"
   end
 end
 
