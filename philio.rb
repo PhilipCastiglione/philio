@@ -23,7 +23,7 @@ end
 
 get '/testcall' do
   @client = Twilio::REST::Client.new account_sid, auth_token_totes_sekret
-  @client.account.calls.create(:url => "http://demo.twilio.com/docs/voice.xml",
+  @client.account.calls.create(:url => "https://philioapp.herokuapp.com/testcontent",
                                :to   => "+61431838460",
                                :from => "+61282945949")
   "oh hi there #{params[:number]}"
