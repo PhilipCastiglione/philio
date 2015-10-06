@@ -4,44 +4,66 @@ require 'sinatra/reloader'
 require 'twilio-ruby'
 require 'pry'
 
-#config_file 'config_or_whatever.yml'
-
+# block for config file approach to secrets
+#config_file 'config_settings.yml'
 #account_sid = settings.twilio[:account_sid]
-#auth_token_totes_sekret = settings.twilio[:auth_token]
+#auth_token = settings.twilio[:auth_token]
+
+# block for environment variables approach to secrets
 account_sid = ENV['ACCOUNT_SID']
-auth_token_totes_sekret = ENV['AUTH_TOKEN']
+auth_token = ENV['AUTH_TOKEN']
 
 get '/' do
-  "oh yeah baby"
+  erb :index
 end
 
-get '/client' do
-  @client = Twilio::REST::Client.new account_sid, auth_token_totes_sekret
-  @client
+get '/test' do
+  @client = Twilio::REST::Client.new account_sid, auth_token
+  @client.account.calls.create(:url => "https://philioapp.herokuapp.com/welcome",
+                               :to   => "+61431838460",
+                               :from => "+61282945949")
+  "The test call is underway, using default number 0431838460."
 end
 
-get '/testcall/:number' do
-  @client = Twilio::REST::Client.new account_sid, auth_token_totes_sekret
-  @client.account.calls.create(:url => "https://philioapp.herokuapp.com/testcontent",
+get '/test/:number' do
+  @client = Twilio::REST::Client.new account_sid, auth_token
+  @client.account.calls.create(:url => "https://philioapp.herokuapp.com/welcome",
                                :to   => "+61" + params[:number],
                                :from => "+61282945949")
-  'you are on a page'
+  "The test call is underway, using number 0#{params[:number]}."
 end
 
 get '/thing/:number' do
   "the number is +61" + params[:number]
 end
 
-post '/testcontent' do
+post '/welcome' do
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "test words"
+    r.Play "http://philioapp.herokuapp.com/welcome.mp3"
+    r.Say "Welcome to Philio, the Twilio API test app."
+    r.Redirect "http://philioapp.herokuapp.com/gather"
   end
   response.text
 end
 
-get '/testcontent' do
+post '/gather' do
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "test words"
+    r.Say "Please enter a number, followed by the hash key."
+    r.Gather action: "http://philipapp.herokuapp.com/respond"
+    r.Say "No number was recorded."
+    r.Redirect "http://philioapp.herokuapp.com/gather"
   end
   response.text
 end
+
+post '/respond' do
+  num = params[:Digits]
+
+  p num
+
+  response = Twilio::TwiML::Response.new do |r|
+    r.Say "You entered the number #{num}. Goodbye"
+  end
+  response.text
+end
+
