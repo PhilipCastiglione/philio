@@ -50,7 +50,7 @@ end
 post '/gather' do
   response = Twilio::TwiML::Response.new do |r|
     r.Say "Please enter a number, followed by the hash key."
-    r.Gather action: "http://philipapp.herokuapp.com/respond"
+    r.Gather action: "http://philioapp.herokuapp.com/respond"
     r.Say "No number was recorded."
     r.Redirect "http://philioapp.herokuapp.com/gather"
   end
