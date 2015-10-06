@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/config_file'
 require 'sinatra/reloader'
 require 'twilio-ruby'
+require 'tilt/erb'
 require 'pry'
 
 # block for config file approach to secrets
@@ -53,6 +54,7 @@ post '/gather' do
     r.Say "No number was recorded."
     r.Redirect "http://philioapp.herokuapp.com/gather"
   end
+  p response
   response.text
 end
 
