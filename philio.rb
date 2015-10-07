@@ -54,14 +54,13 @@ post '/gather' do
     r.Say "No number was recorded."
     r.Redirect "http://philioapp.herokuapp.com/gather"
   end
-  p response
   response.text
 end
 
 post '/respond' do
   num = params[:Digits]
 
-  p num
+  open('numbers.txt', 'a') { |f| f.puts "#{num}" }
 
   response = Twilio::TwiML::Response.new do |r|
     r.Say "You entered the number #{num}. Goodbye"
