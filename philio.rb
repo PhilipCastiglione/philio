@@ -42,28 +42,47 @@ post '/welcome' do
   response = Twilio::TwiML::Response.new do |r|
     r.Play "http://philioapp.herokuapp.com/welcome.mp3"
     r.Say "Welcome to Philio, the Twilio API test app."
-    r.Redirect "http://philioapp.herokuapp.com/gather"
+    r.Redirect "http://philioapp.herokuapp.com/validate_dob"
   end
   response.text
 end
 
-post '/gather' do
+post '/validate_dob' do
+  response = Twilio::TwiML::Response.new do |r|
+    r.Say "Please enter your date of birth. The third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, followed by the hash key."
+    r.Gather action: "http://philioapp.herokuapp.com/confirm_dob"
+    r.Say "Your date of birth must be entered to continue."
+    r.Redirect "http://philioapp.herokuapp.com/validate_dob"
+  end
+  response.text
+end
+
+post '/confirm_dob' do
+  dob = params[:Digits]
+  day = dob.slice(0,2).to_i
+  month = dob.slice(2,2).to_i
+  year = dob.slice(4,4).to_i
+  # do dob logic
+
+end
+ 
+post '/get_mobile' do
   response = Twilio::TwiML::Response.new do |r|
     r.Say "Please enter a number, followed by the hash key."
     r.Gather action: "http://philioapp.herokuapp.com/respond"
     r.Say "No number was recorded."
-    r.Redirect "http://philioapp.herokuapp.com/gather"
+    r.Redirect "http://philioapp.herokuapp.com/get_mobile"
   end
   response.text
 end
 
 post '/respond' do
-  num = params[:Digits]
+  mobile_num = params[:Digits]
 
-  open('numbers.txt', 'a') { |f| f.puts "#{num}" }
+  open('numbers.txt', 'a') { |f| f.puts "#{mobile_num}" }
 
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "You entered the number #{num}. Goodbye"
+    r.Say "You entered the number #{mobile_num}. Goodbye"
   end
   response.text
 end
