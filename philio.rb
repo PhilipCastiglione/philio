@@ -66,7 +66,7 @@ post '/validate_dob' do
       r.Say "Oh no! You must be 18 to claim free beer! Come back on your 18th birthday."
     else
       r.Say "That would make you #{age.to_i} years old. Getting on a bit there buddy. Is that correct?"
-      r.Say "Press 1 to confirm or 0 to go back and enter again."
+      r.Say "Press 1 to confirm or 0 to go back and enter again, followed by the hash key."
       r.Gather action: "http://philioapp.herokuapp.com/confirm_dob"
       r.Say "We didn't receive any response."
       r.Redirect "http://philioapp.herokuapp.com/get_dob"
@@ -79,7 +79,7 @@ post '/confirm_dob' do
   confirm = params[:Digits]
 
   response = Twilio::TwiML::Response.new do |r|
-    if confirm != 1
+    if confirm != "1"
       r.Redirect "http://philioapp.herokuapp.com/get_dob"
     else
       r.Say "To claim a delicious beer, we will send you a text message with instructions."
@@ -111,7 +111,7 @@ post '/validate_mobile' do
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     else
       r.Say "You entered the number #{mobile_num}. Is that correct?"
-      r.Say "Press 1 to confirm or 0 to go back and enter again."
+      r.Say "Press 1 to confirm or 0 to go back and enter again, followed by the hash key."
       r.Gather action: "http://philioapp.herokuapp.com/confirm_mobile"
       r.Say "We didn't receive any response."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
@@ -124,11 +124,13 @@ post '/confirm_mobile' do
   confirm = params[:Digits]
 
   response = Twilio::TwiML::Response.new do |r|
-    if confirm != 1
+    if confirm != "1"
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     else
       r.Say "Ace, expect a text message soon. Enjoy your beer!"
     end
   end
+
+  #start an async job to send the call to traction if confirm == "1"
   response.text
 end
