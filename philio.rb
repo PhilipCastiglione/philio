@@ -62,7 +62,8 @@ post '/confirm_dob' do
   day = dob.slice(0,2).to_i
   month = dob.slice(2,2).to_i
   year = dob.slice(4,4).to_i
-  # do dob logic
+
+  age = Time.now.to_date - Date.new(year, month, day)
 
 end
  
