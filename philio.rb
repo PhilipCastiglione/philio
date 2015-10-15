@@ -44,6 +44,10 @@ post '/welcome' do
 end
 
 post '/get_dob' do
+  ['dob', 'mobile'].each do |v|
+    session[v] = ""
+  end
+
   response = Twilio::TwiML::Response.new do |r|
     r.Say "Please enter your date of birth. The third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, followed by the hash key."
     r.Gather action: "http://philioapp.herokuapp.com/validate_dob"
@@ -55,6 +59,8 @@ end
 
 post '/validate_dob' do
   dob = params[:Digits]
+  session['dob'] = dob
+
   day = dob.slice(0,2).to_i
   month = dob.slice(2,2).to_i
   year = dob.slice(4,4).to_i
@@ -101,6 +107,7 @@ end
 
 post '/validate_mobile' do
   mobile_num = params[:Digits]
+  session['mobile'] = mobile_num
 
   response = Twilio::TwiML::Response.new do |r|
     if mobile_num.length != 10
@@ -127,10 +134,24 @@ post '/confirm_mobile' do
     if confirm != "1"
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     else
-      r.Say "Ace, expect a text message soon. Enjoy your beer!"
+      r.Redirect "http://philioapp.herokuapp.com/confirm_traction"
     end
   end
-
-  #start an async job to send the call to traction if confirm == "1"
   response.text
 end
+
+post '/confirm_traction' do
+  # send to traction for validation yo
+  # # also store the response in traction_response
+  response = Twilio::TwiML::Response.new do |r|
+    if traction_response == true # set this to the actual expected response
+      r.Say "Ace, expect a text message soon. Enjoy your beer!"
+    else
+      r.Say "Soz, #{traction_response}."
+    end
+  end
+  response.text
+end
+
+# can i remove the response object and just add .text to the end of the response block?
+  #start an async job to send SMS
