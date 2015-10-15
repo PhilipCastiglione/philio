@@ -44,9 +44,8 @@ post '/welcome' do
 end
 
 post '/get_dob' do
-  ['dob', 'mobile'].each do |v|
-    session[v] = ""
-  end
+  session['dob'] = ""
+  session['mobile'] = ""
 
   response = Twilio::TwiML::Response.new do |r|
     r.Say "Please enter your date of birth. The third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, followed by the hash key."
@@ -141,8 +140,17 @@ post '/confirm_mobile' do
 end
 
 post '/confirm_traction' do
+  # TESTING SESSION USAGE
+  p session
+  p session['dob']
+  p session['mobile']
+
+  traction_response = true
   # send to traction for validation yo
-  # # also store the response in traction_response
+  # also store the response in traction_response
+
+  # start async job to send text message if traction_response is true or whatever
+
   response = Twilio::TwiML::Response.new do |r|
     if traction_response == true # set this to the actual expected response
       r.Say "Ace, expect a text message soon. Enjoy your beer!"
@@ -154,4 +162,3 @@ post '/confirm_traction' do
 end
 
 # can i remove the response object and just add .text to the end of the response block?
-  #start an async job to send SMS
