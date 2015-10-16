@@ -44,9 +44,6 @@ post '/welcome' do
 end
 
 post '/get_dob' do
-  session['dob'] = ""
-  session['mobile'] = ""
-
   response = Twilio::TwiML::Response.new do |r|
     r.Say "Please enter your date of birth in days, months and years, followed by the hash key. For example, the third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, hash."
     r.Gather action: "http://philioapp.herokuapp.com/validate_dob"
@@ -58,7 +55,6 @@ end
 
 post '/validate_dob' do
   dob = params[:Digits]
-  session['dob'] = dob
 
   day = dob.slice(0,2).to_i
   month = dob.slice(2,2).to_i
@@ -113,7 +109,6 @@ end
 
 post '/validate_mobile' do
   mobile_num = params[:Digits]
-  session['mobile'] = mobile_num
   spoken_num = mobile_num.split('').join(' ')
 
   response = Twilio::TwiML::Response.new do |r|
@@ -148,11 +143,6 @@ post '/confirm_mobile' do
 end
 
 post '/confirm_traction' do
-  # TESTING SESSION USAGE
-  p session
-  p session['dob']
-  p session['mobile']
-
   traction_response = true
   # send to traction for validation yo
   # also store the response in traction_response
