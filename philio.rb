@@ -103,7 +103,7 @@ end
  
 post '/get_mobile' do
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "Please enter your mobile phone number, followed by the hash key. Don't be shy winky face!"
+    r.Say "Please enter your mobile phone number, followed by the hash key. Don't be shy, winky face!"
     r.Gather action: "http://philioapp.herokuapp.com/validate_mobile"
     r.Say "No number was recorded."
     r.Redirect "http://philioapp.herokuapp.com/get_mobile"
