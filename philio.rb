@@ -35,22 +35,20 @@ get '/test/:number' do
 end
 
 post '/welcome' do
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     r.Play "http://philioapp.herokuapp.com/welcome.mp3"
     r.Say "Welcome to Philio, the Twilio API test app."
     r.Redirect "http://philioapp.herokuapp.com/get_dob"
-  end
-  response.text
+  end.text
 end
 
 post '/get_dob' do
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     r.Say "Please enter your date of birth in days, months and years, followed by the hash key. For example, the third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, hash."
     r.Gather action: "http://philioapp.herokuapp.com/validate_dob"
     r.Say "Your date of birth must be entered to continue."
     r.Redirect "http://philioapp.herokuapp.com/get_dob"
-  end
-  response.text
+  end.text
 end
 
 post '/validate_dob' do
@@ -66,7 +64,7 @@ post '/validate_dob' do
     age = 'invalid'
   end
 
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     if age == 'invalid'
       r.Say "Your date of birth did not pass validation."
       r.Redirect "http://philioapp.herokuapp.com/get_dob"
@@ -79,39 +77,36 @@ post '/validate_dob' do
       r.Say "We didn't receive any response."
       r.Redirect "http://philioapp.herokuapp.com/get_dob"
     end
-  end
-  response.text
+  end.text
 end
 
 post '/confirm_dob' do
   confirm = params[:Digits]
 
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     if confirm != "1"
       r.Redirect "http://philioapp.herokuapp.com/get_dob"
     else
       r.Say "To claim a delicious beer, we will send you a text message with instructions."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     end
-  end
-  response.text
+  end.text
 end
  
 post '/get_mobile' do
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     r.Say "Please enter your mobile phone number, followed by the hash key. Don't be shy, winky face!"
     r.Gather action: "http://philioapp.herokuapp.com/validate_mobile"
     r.Say "No number was recorded."
     r.Redirect "http://philioapp.herokuapp.com/get_mobile"
-  end
-  response.text
+  end.text
 end
 
 post '/validate_mobile' do
   mobile_num = params[:Digits]
   spoken_num = mobile_num.split('').join(' ')
 
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     if mobile_num.length != 10
       r.Say "We were expecting 10 digits for a mobile, but we received the number #{spoken_num}."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
@@ -121,43 +116,39 @@ post '/validate_mobile' do
     else
       r.Say "You entered the number #{spoken_num}. Is that correct?"
       r.Say "Press 1 to confirm or 0 to go back and enter again, followed by the hash key."
-      r.Gather action: "http://philioapp.herokuapp.com/confirm_mobile"
+      r.Gather action: "http://philioapp.herokuapp.com/confirm_mobile/#{mobile_num}"
       r.Say "We didn't receive any response."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     end
-  end
-  response.text
+  end.text
 end
 
-post '/confirm_mobile' do
+post '/confirm_mobile/:number' do
   confirm = params[:Digits]
 
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     if confirm != "1"
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     else
-      r.Redirect "http://philioapp.herokuapp.com/confirm_traction"
+      r.Redirect "http://philioapp.herokuapp.com/confirm_traction/#{params[:number]}"
     end
-  end
-  response.text
+  end.text
 end
 
-post '/confirm_traction' do
+post '/confirm_traction/:number' do
   traction_response = true
   # send to traction for validation yo
   # also store the response in traction_response
 
   # start async job to send text message if traction_response is true or whatever
 
-  response = Twilio::TwiML::Response.new do |r|
+  Twilio::TwiML::Response.new do |r|
     if traction_response == true # set this to the actual expected response
       r.Say "Ace, expect a text message soon. Enjoy your beer!"
     else
       r.Say "Soz, #{traction_response}."
     end
-  end
-  response.text
+  end.text
 end
 
-# can i remove the response object and just add .text to the end of the response block?
-# remove need to enter hash after confirmations
+# remove need to enter hash after confirmations using finishOnKey and make them just 1 or any othe number`
