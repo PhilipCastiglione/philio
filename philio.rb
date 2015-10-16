@@ -48,7 +48,7 @@ post '/get_dob' do
   session['mobile'] = ""
 
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "Please enter your date of birth in days, months and years, followed by the hash key. The third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, hash."
+    r.Say "Please enter your date of birth in days, months and years, followed by the hash key. For example, the third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, hash."
     r.Gather action: "http://philioapp.herokuapp.com/validate_dob"
     r.Say "Your date of birth must be entered to continue."
     r.Redirect "http://philioapp.herokuapp.com/get_dob"
@@ -114,16 +114,17 @@ end
 post '/validate_mobile' do
   mobile_num = params[:Digits]
   session['mobile'] = mobile_num
+  spoken_num = mobile_num.split('').join(' ')
 
   response = Twilio::TwiML::Response.new do |r|
     if mobile_num.length != 10
-      r.Say "We were expecting 10 digits for a mobile, but we received the number #{mobile_num}."
+      r.Say "We were expecting 10 digits for a mobile, but we received the number #{spoken_num}."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     elsif mobile_num[0] != "0"
-      r.Say "We were expecting the first number to be a zerom but we received the number #{mobile_num}. Don't worry about area code or anything."
+      r.Say "We were expecting the first number to be a zero but we received the number #{spoken_num}. Don't worry about area code or anything."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     else
-      r.Say "You entered the number #{mobile_num}. Is that correct?"
+      r.Say "You entered the number #{spoken_num}. Is that correct?"
       r.Say "Press 1 to confirm or 0 to go back and enter again, followed by the hash key."
       r.Gather action: "http://philioapp.herokuapp.com/confirm_mobile"
       r.Say "We didn't receive any response."
