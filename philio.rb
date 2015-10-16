@@ -48,7 +48,7 @@ post '/get_dob' do
   session['mobile'] = ""
 
   response = Twilio::TwiML::Response.new do |r|
-    r.Say "Please enter your date of birth. The third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, followed by the hash key."
+    r.Say "Please enter your date of birth in days, months and years, followed by the hash key. The third of April nineteen eighty five would be entered zero three, zero four, one nine eight five, hash."
     r.Gather action: "http://philioapp.herokuapp.com/validate_dob"
     r.Say "Your date of birth must be entered to continue."
     r.Redirect "http://philioapp.herokuapp.com/get_dob"
@@ -64,10 +64,17 @@ post '/validate_dob' do
   month = dob.slice(2,2).to_i
   year = dob.slice(4,4).to_i
 
-  age = (Time.now - Time.new(year, month, day)) / 60 / 60 / 24 / 365
+  begin
+    age = (Time.now - Time.new(year, month, day)) / 60 / 60 / 24 / 365
+  rescue
+    age = 'invalid'
+  end
 
   response = Twilio::TwiML::Response.new do |r|
-    if age < 18
+    if age == 'invalid'
+      r.Say "Your date of birth did not pass validation."
+      r.Redirect "http://philioapp.herokuapp.com/get_dob"
+    elsif age < 18
       r.Say "Oh no! You must be 18 to claim free beer! Come back on your 18th birthday."
     else
       r.Say "That would make you #{age.to_i} years old. Getting on a bit there buddy. Is that correct?"
@@ -162,3 +169,4 @@ post '/confirm_traction' do
 end
 
 # can i remove the response object and just add .text to the end of the response block?
+# remove need to enter hash after confirmations
