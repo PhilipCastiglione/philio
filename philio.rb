@@ -72,8 +72,8 @@ post '/validate_dob' do
       r.Say "Oh no! You must be 18 to claim free beer! Come back on your 18th birthday."
     else
       r.Say "That would make you #{age.to_i} years old. Getting on a bit there buddy. Is that correct?"
-      r.Say "Press 1 to confirm or 0 to go back and enter again, followed by the hash key."
-      r.Gather action: "http://philioapp.herokuapp.com/confirm_dob"
+      r.Say "Press 1 to confirm or any other key to go back and try again."
+      r.Gather action: "http://philioapp.herokuapp.com/confirm_dob", numDigits: "1"
       r.Say "We didn't receive any response."
       r.Redirect "http://philioapp.herokuapp.com/get_dob"
     end
@@ -111,12 +111,12 @@ post '/validate_mobile' do
       r.Say "We were expecting 10 digits for a mobile, but we received the number #{spoken_num}."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     elsif mobile_num[0] != "0"
-      r.Say "We were expecting the first number to be a zero but we received the number #{spoken_num}. Don't worry about area code or anything."
+      r.Say "We were expecting the first number to be a zero but we received the number #{spoken_num}. Don't worry about area code."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     else
       r.Say "You entered the number #{spoken_num}. Is that correct?"
-      r.Say "Press 1 to confirm or 0 to go back and enter again, followed by the hash key."
-      r.Gather action: "http://philioapp.herokuapp.com/confirm_mobile/#{mobile_num}"
+      r.Say "Press 1 to confirm or any other key to go back and try again."
+      r.Gather action: "http://philioapp.herokuapp.com/confirm_mobile/#{mobile_num}", numDigits: "1"
       r.Say "We didn't receive any response."
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     end
@@ -152,5 +152,3 @@ post '/confirm_traction/:number' do
     end
   end.text
 end
-
-# remove need to enter hash after confirmations using finishOnKey and make them just 1 or any othe number`
