@@ -137,10 +137,12 @@ end
 
 post '/confirm_traction/:number' do
   traction_response = true
-  # send to traction for validation yo
+  # determine if record exist in traction with mobile number in params[:number]
+  # if it DOES, end the call because they can't get free beer soz
+  # if not, then we can end the call wth success, post ti traction and
   # also store the response in traction_response
-
   # start async job to send text message if traction_response is true or whatever
+
 
   Twilio::TwiML::Response.new do |r|
     if traction_response == true # set this to the actual expected response
