@@ -130,6 +130,7 @@ post '/confirm_mobile/:number' do
     if confirm != "1"
       r.Redirect "http://philioapp.herokuapp.com/get_mobile"
     else
+      r.Say "Let us just confirm your mobile number. This may take a few seconds."
       r.Redirect "http://philioapp.herokuapp.com/confirm_traction/#{params[:number]}"
     end
   end.text
