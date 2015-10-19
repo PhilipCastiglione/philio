@@ -3,16 +3,23 @@ require 'sinatra/config_file'
 require 'sinatra/reloader'
 require 'twilio-ruby'
 require 'tilt/erb'
-require 'pry'
+require 'net/http'
+require 'json'
 
 # block for config file approach to secrets
-#config_file 'config_settings.yml'
+#config_file 'config_or_whatever.yml'
 #account_sid = settings.twilio[:account_sid]
 #auth_token = settings.twilio[:auth_token]
+#traction_user_id = settings.traction[:user_id]
+#traction_endpoint_id = settings.traction[:endpoint_id]
+#traction_password = settings.traction[:password]
 
 # block for environment variables approach to secrets
 account_sid = ENV['ACCOUNT_SID']
 auth_token = ENV['AUTH_TOKEN']
+traction_password = ENV['TRACTION_PASSWORD']
+traction_user_id = ENV['USER_ID']
+traction_endpoint_id = ENV['ENDPOINT_ID']
 
 get '/' do
   erb :index
@@ -137,19 +144,33 @@ post '/confirm_mobile/:number' do
 end
 
 post '/confirm_traction/:number' do
-  traction_response = true
-  # determine if record exist in traction with mobile number in params[:number]
-  # if it DOES, end the call because they can't get free beer soz
-  # if not, then we can end the call wth success, post ti traction and
-  # also store the response in traction_response
-  # start async job to send text message if traction_response is true or whatever
+  retrieve_uri = URI.parse('http://int.api.tractionplatform.com/ext/RetrieveCustomer')
+  add_uri = URI.parse('http://int.api.tractionplatform.com/ext/AddCustomer')
+  data = {
+    'MATCHKEY': 'M',
+    'MATCHVALUE': params[:number],
+    'PASSWORD': traction_password,
+    'USERID': traction_user_id,
+    "ENDPOINTID": traction_endpoint_id
+  }
 
+  retrieve_response = Net::HTTP.post_form(retrieve_uri, data)
+
+  if retrieve_response['trac-result'] == '7'
+    # make async;
+    # add_response = Net::HTTP.post_form(add_uri, data)
+    # start text message
+  end
 
   Twilio::TwiML::Response.new do |r|
-    if traction_response == true # set this to the actual expected response
+    if retrieve_response['trac-result'] == '7'
       r.Say "Ace, expect a text message soon. Enjoy your beer!"
+    elsif retrieve_response['trac-result'] == '0'
+      r.Say "You are have already signed up and are not eligble."
     else
-      r.Say "Soz, #{traction_response}."
+      r.Say "Soz, #{retrieve_response['trac-error']}."
     end
   end.text
 end
+
+#is it possible to check that the user agent is the twilio server? this might manage the risk of arbitrary posts to signup mass users
