@@ -8,6 +8,7 @@ require 'json'
 
 # block for config file approach to secrets
 #config_file 'config_or_whatever.yml'
+#twilio_number = settings.twilio[:phone_number]
 #account_sid = settings.twilio[:account_sid]
 #auth_token = settings.twilio[:auth_token]
 #traction_user_id = settings.traction[:user_id]
@@ -15,30 +16,31 @@ require 'json'
 #traction_password = settings.traction[:password]
 
 # block for environment variables approach to secrets
+twilio_number = ENV['PHONE_NUMBER']
 account_sid = ENV['ACCOUNT_SID']
 auth_token = ENV['AUTH_TOKEN']
 traction_password = ENV['TRACTION_PASSWORD']
 traction_user_id = ENV['USER_ID']
 traction_endpoint_id = ENV['ENDPOINT_ID']
 
+Twilio.configure do |config|
+  config.account_sid = account_sid
+  config.auth_token = auth_token
+end
+
 get '/' do
   erb :index
 end
 
 get '/test' do
-  @client = Twilio::REST::Client.new account_sid, auth_token
-  @client.account.calls.create(:url => "https://philioapp.herokuapp.com/welcome",
+  Twilio::REST::Client.new.account.calls.create(:url => "https://philioapp.herokuapp.com/welcome",
                                :to   => "+61431838460",
                                :from => "+61282945949")
   "The test call is underway, using default number 0431838460."
 end
 
 get '/test/:number' do
-  @client = Twilio::REST::Client.new account_sid, auth_token
-  @client.account.calls.create(:url => "https://philioapp.herokuapp.com/welcome",
-                               :to   => "+61" + params[:number],
-                               :from => "+61282945949")
-  "The test call is underway, using number 0#{params[:number]}."
+  "Here is a form associated with #{params[:number]}."
 end
 
 post '/welcome' do
@@ -157,9 +159,28 @@ post '/confirm_traction/:number' do
   retrieve_response = Net::HTTP.post_form(retrieve_uri, data)
 
   if retrieve_response['trac-result'] == '7'
-    # make async;
-    # add_response = Net::HTTP.post_form(add_uri, data)
-    # start text message
+    # put all this in an async method;
+    # add new record to traction
+    add_response = Net::HTTP.post_form(add_uri, data)
+    # send text message with link to mobile using Twilio
+    text_response = Twilio::REST::Client.messages.create(
+      from: twilio_number,
+      to: "+61#{params[:number].slice(1,9)}",
+      body: "Hello from Little Creatures. Pop over and fill in this form, would you? http://philioapp.herokuapp.com/test/#{params[:number]}" # this can only be the mobile number if validation is strong and includes state
+    )
+
+    if add_response == true &&
+      text_response == true
+      # add the record to our database
+    elsif add_response == true &&
+      text_response == false
+      # handle this
+    elsif add_response == false &&
+      text_response == false
+      # handle this
+    else
+      # handle this
+    end
   end
 
   Twilio::TwiML::Response.new do |r|
