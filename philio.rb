@@ -146,6 +146,7 @@ post '/confirm_mobile/:number' do
 end
 
 post '/confirm_traction/:number' do
+  #is it possible to check that the user agent is the twilio server? this might manage the risk of arbitrary posts to signup mass users
   retrieve_uri = URI.parse('http://int.api.tractionplatform.com/ext/RetrieveCustomer')
   add_uri = URI.parse('http://int.api.tractionplatform.com/ext/AddCustomer')
   data = {
@@ -162,22 +163,20 @@ post '/confirm_traction/:number' do
     # put all this in an async method;
     # add new record to traction
     add_response = Net::HTTP.post_form(add_uri, data)
-    # send text message with link to mobile using Twilio
-    text_response = Twilio::REST::Client.messages.create(
-      from: twilio_number,
-      to: "+61#{params[:number].slice(1,9)}",
-      body: "Hello from Little Creatures. Pop over and fill in this form, would you? http://philioapp.herokuapp.com/test/#{params[:number]}" # this can only be the mobile number if validation is strong and includes state
-    )
 
-    if add_response == true &&
-      text_response == true
-      # add the record to our database
-    elsif add_response == true &&
-      text_response == false
-      # handle this
-    elsif add_response == false &&
-      text_response == false
-      # handle this
+    if add_response == true
+      # send text message with link to mobile using Twilio
+      text_response = Twilio::REST::Client.messages.create(
+        from: twilio_number,
+        to: "+61#{params[:number].slice(1,9)}",
+        body: "Hello from Little Creatures. Pop over and fill in this form, would you? http://philioapp.herokuapp.com/test/#{params[:number]}" # this can only be the mobile number if validation is strong and includes state
+      )
+
+      if text_response == true
+        # add the record to our database
+      else
+        # handle this
+      end
     else
       # handle this
     end
@@ -189,9 +188,8 @@ post '/confirm_traction/:number' do
     elsif retrieve_response['trac-result'] == '0'
       r.Say "You are have already signed up and are not eligble."
     else
+      # handle this properly
       r.Say "Soz, #{retrieve_response['trac-error']}."
     end
   end.text
 end
-
-#is it possible to check that the user agent is the twilio server? this might manage the risk of arbitrary posts to signup mass users
